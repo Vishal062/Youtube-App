@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <style>
+        body{
+            display: flex;
+            flex-direction: column;
+        }
+        /* navbar style part */
+        #navbar{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-bottom: 5%;
+            margin-top: 0.5%;
+        }
+        #start {
+            display: flex;
+            flex-direction: row;
+            margin-top: 5px;
+            margin-left: 20px;
+        }
+        #start div{
+            margin-right: 20px;
+            font-size: 24px !important;
+            cursor: pointer;
+        }
+        #start img {
+            margin-top: -12px;
+            cursor: pointer;
+        }
+
+        #center{
+            display: flex;
+            flex-direction: row;
+            margin-top: 5px;
+
+        }
+
+        #center button {
+            height: 33px;
+            width: 60px;
+            border: 1px solid rgb(194, 194, 194);;
+            cursor: pointer;
+        }
+
+        #center input{
+            height: 30px;
+            width: 400px;
+            border: 1px solid rgb(194, 194, 194);
+        }
+
+        #end span{
+            font-size:26px !important;
+            color: rgb(94, 94, 94);
+            margin-left:25px;
+            cursor: pointer;  
+        }
+        #end {
+            margin-right:25px;
+            margin-top: 5px;
+        }
+        .material-icons{
+            font-size: 28px !important;
+            color: rgb(94, 94, 94) !important;
+        }
+
+        /* data that append in grid style */
+        #main {
+            display: grid;
+            grid-template-columns: repeat(4, 22%);
+            justify-content: center;
+            gap: 3%;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar">
+        <div id="start">
+            <div class="material-icons">menu</div>
+            <img src="https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6-1200-80.jpg" alt="menuIcon" 
+            style="height: 50px; width: 100px;"/>
+        </div>
+
+        <div id="center">
+            <input type="text" id="name" placeholder="Search your fav video">
+            <button onclick="youtube()" class="material-icons">search</button>
+            <span
+          class="material-icons"
+          style="font-size: 24px !important; margin-left: 10px; margin-top: 3px"
+          >mic
+        </span>
+        </div>
+
+        <div id="end">
+        <span class="material-icons">video_call</span>
+        <span class="material-icons">apps</span>
+        <span class="material-icons">notifications</span>
+        <span class="material-icons">account_circle</span>
+        </div>
+    </div>
+
+    <!-- for appending the data -->
+    <div id="main"></div>
+</body>
+</html>
+<script>
+    var main = document.getElementById("main");
+    
+    //creating a async function to fetch the data from api>>
+    //AIzaSyD252lZpJ9RDI6PODoHWh2MmhOTSTYZJJU My api Id>>
+
+    //trending video already append in home page>>
+
+    async function showVideos(){
+        let data = document.getElementById('name');
+        let videos = await fetch(`https://youtube.googleapis.com/youtube/v3/videos?chart=mostPopular&regionCode=IN&&key=AIzaSyD252lZpJ9RDI6PODoHWh2MmhOTSTYZJJU&maxResults=20`);
+        let res = await videos.json();
+        return res;
+    }
+    
+    async function defaultPage(){
+        main.innerHTML = null;
+       let result = await showVideos();
+       let {items} = result;
+       console.log(result);
+
+       items.filter((el) =>{ return el.id.videoId != undefined })
+
+       items.forEach(({id})=>{
+           let video_div = document.createElement('div');
+           video_div.innerHTML = `<iframe width="100%" height="150" src="https://www.youtube.com/embed/${id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+           main.append(video_div);
+           console.log(id)
+       })
+
+    }
+
+    defaultPage();
+
+    async function youtube(){
+        main.innerHTML =null; //making null so it refresh automatically>
+
+        let data = document.getElementById("name").value;
+
+        let mainData = await fetch(
+            `https://youtube.googleapis.com/youtube/v3/search?q=${data}&key=AIzaSyD252lZpJ9RDI6PODoHWh2MmhOTSTYZJJU&maxResults=20`
+        );
+
+        var result = await mainData.json();
+        console.log('result:', result);
+
+        let {items} = result; //taking just the objects in items from results using destructuring {items}
+
+        items.forEach(({id: { videoId}}) => {
+            //for Each loop to apend the data with each videoId>>
+
+            video_data = document.createElement("div"); //created the div
+            
+            video_data.innerHTML = `<iframe width="100%" height="170px" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`; 
+            //innerhtml of the div is set to the content we want to display
+
+            main.append(video_data); //Appending the created data>>
+            console.log('video_data:', video_data)
+
+        });
+    }
+</script>
